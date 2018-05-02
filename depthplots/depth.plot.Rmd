@@ -1,0 +1,119 @@
+---
+title: "depth.plot"
+author: "Omker Mahalanobish, Somedip Karmakar"
+date: "January 11, 2016"
+output: slidy_presentation
+---
+
+## What is __`depth`__??
+
+The notion of **`depth`** has been used in statistics as a way to identify the center of a multivariate distribution given by the set of points (also referred to as the 'data cloud').
+
+In general, the greater the depth of a point, the more densely it is surrounded by other points of the data cloud. _A simple example of a depth measure in the univariate case is the median - given a set of points on the real line, the median has the greatest number of points on either side (at least n/2)_.
+
+Once the depth for each point in the data cloud has been defined, there are actually two main quantities which can be computed over this depth measure - the point in the plane with the maximum depth, often called the median of the data cloud under that depth measure, and the region of all points with depth less than some fraction _k_ (usually called the outliers).
+
+Over the years, a large number of depth measures have been proposed like **`Mahalanobis depth`**, **`Half-Space depth`**, **`Simplicial depth`** and **`Spatial depth`**.
+
+
+## Different types of **`depth`**:
+### __Mahalanobis Depth:__ 
+- `MD`$_x($$\mu,\Sigma) : \frac{1}{1\ +\ (x-\mu)^T\Sigma^{-1}(x-\mu)}$
+
+### __Half-Space Depth:__
+- `HSD`$_x : \frac{min_l\ |\ \{X_i\ :\ l'(x-X_i)\ \le\ 0\}\ |}{n}$
+
+ 
+### __Simplicial Depth:__
+- `SD`$_x : \frac{no.\ of\ (d+1)\ dimensional\ simplexes\ containing\ the\ pt\ x}{C^n_{d+1}}$
+
+### __Spatial Depth:__
+- `SPD`$_x : 1 - ||\sum_{i=1}^n\frac{x-X_i}{||x-X_i||}||$
+ 
+ 
+## __spatial.depth__ :
+
+Used to obtain the __`spatial depth`__ of a p-variate observation with respect to a p-variate data cloud.
+
+```{r}
+library(depth.plot)
+u <- matrix(rnorm(90,0,1), ncol = 3)
+u0 <- matrix(runif(9,0,1), ncol = 3)
+spatial.depth(u0, u)
+u1 <- matrix(rnorm(9,2,4), ncol = 3)
+spatial.depth(u1, u)
+```
+
+## spatial.rank
+
+`Spatial rank` of a p-variate data point `x` is another p-variate vector defined as: $$SPR_x = \sum_{i=1}^n\frac{x-X_i}{||x-X_i||}$$
+Each element of the `rank` lies between -1 and +1 depending on their distance from the median. The sign of each of the elements represent their respective direction.
+
+```{r}
+u <- matrix(rnorm(90,0,1), ncol = 3)
+u0 <- print(runif(3,-2,2))
+spatial.rank(u0, u)
+```
+
+
+## __multi.quant__
+
+Multivariate quantiles are a bit tricky. In order to get the $q^{th}$ quantile of a p-variate data cloud, $q$ needs to be a __`valid spatial rank`__ of the appropiate dimension. The median corresponds to a __`null`__ spatial rank.
+
+Now, _`y`_ is the $q^{th}$ p-variate quantile with respect to the p-variate data cloud {$X_i$}, if _`y`_ minimizes $$\sum_{i=1}^n||\ X_i-y||\ +\ \sum_{i=1}^nq^T(\ X_i-y)$$
+```{r}
+u <- matrix(rnorm(90,0,1), ncol = 3)
+u0 <- print(runif(3,-1,1))
+rank <- print(spatial.rank(u0, u))
+multi.quant(rank,u)
+```
+
+
+## __spatial.outlier__
+
+Used to identify and obtain the p-variate spatial outliers (if present) with respect to a p-variate data cloud, using the concept of `spatial depth`.
+
+```{r}
+u <- matrix(rnorm(90,0,1), ncol = 3)
+spatial.outlier(u, threshold = 0.2)
+spatial.outlier(u[-1,],u[1,])
+```
+
+## __Used in the ECS 2.0 clustering project__
+
+Compared the sales pattern of the stores to the sales pattern of their demographic clusters and found that there are some outlier stores in terms of sales pattern.
+
+![jitterplot](/Users/omahala/Desktop/self interest/depth.plots/clustering_jitter.png)
+
+
+## __dd.plot__
+
+A multivariate generalisation of QQ-plots.
+```{r,echo=FALSE}
+library(graphics)
+```
+```{r}
+u1 <- matrix(rnorm(300,0,4), ncol = 3)
+dd.plot(u1,col = "red")
+```
+
+## __dd.plot__
+```{r}
+u1 <- matrix(rnorm(600,0,1), ncol = 3)
+u2 <- matrix(rnorm(600,0,4), ncol = 3)
+u3 <- matrix(rnorm(600,2,1), ncol = 3)
+u4 <- matrix(rnorm(600,2,4), ncol = 3)
+```
+```{r,echo=FALSE}
+library(graphics)
+par(mfrow=c(2,2))
+dd.plot(u1, main = "identical")
+dd.plot(u2, main = "change in spread")
+dd.plot(u3, main = "change in location")
+dd.plot(u4, main = "change in location & spread")
+```
+
+
+## *__$$Thank\ You :)$$__*
+###   __$$-\ Omker$$__
+###   __$$-\ Somedip$$__
